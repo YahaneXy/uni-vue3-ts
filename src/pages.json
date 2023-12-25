@@ -1,0 +1,78 @@
+{
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+		}
+	},
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/test/index",
+			"style": {
+				"navigationBarTitleText": "测试"
+			}
+		},
+		{
+			"path": "pages/personal/personal",
+			"style": {
+				"navigationBarTitleText": "个人主页"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		}
+	],
+	"subPackages": [
+		{
+			"root": "pagesSub",
+			"pages": [
+				{
+					"path": "test/index",
+					"style": { "navigationBarTitleText": "测试" }
+				}
+			]
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#000",
+		"selectedColor": "#303133",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "black",
+		"list": [
+			{
+				"iconPath": "/static/images/tab/tab_index.png",
+				"selectedIconPath": "/static/images/tab/tab_index_on.png",
+				"text": "首页",
+				"pagePath": "pages/index/index"
+			},
+			{
+				"iconPath": "/static/images/tab/min_button.png",
+				"selectedIconPath": "/static/images/tab/min_button_on.png",
+				"text": "测试",
+				"pagePath": "pages/test/index",
+				"midButton": true
+			},
+			{
+				"iconPath": "/static/images/tab/tab_personal.png",
+				"selectedIconPath": "/static/images/tab/tab_personal_on.png",
+				"text": "我的",
+				"pagePath": "pages/personal/personal"
+			}
+		]
+	}
+}

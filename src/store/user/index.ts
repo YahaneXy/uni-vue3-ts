@@ -1,0 +1,52 @@
+import { defineStore } from 'pinia';
+
+import type { LoginParams } from '@/api/base';
+import { apiLogin, logout } from '@/api/base';
+import type { BizUserVo } from '@/api/personal/model/personalModel';
+
+export const useUserStore = defineStore('user', {
+	state: () => {
+		return {
+			token: '',
+			openId: '',
+			isLogin: false,
+			userInfo: null as BizUserVo | null,
+		};
+	},
+	persist: {
+		storage: {
+			getItem: uni.getStorageSync,
+			setItem: uni.setStorageSync,
+		},
+	},
+	actions: {
+		login(params: LoginParams) {
+			return apiLogin(params).then((res) => {
+				if (res.data) {
+					const { data } = res;
+					this.openId = params.openId;
+					return data;
+				}
+			});
+		},
+		// 如果后端有token缓存，就直接走这一步
+		saveLoginData(token: string) {
+			this.token = token;
+			this.isLogin = true;
+		},
+		logout() {
+			return logout().then(() => {
+				this.removeUserInfo();
+			});
+		},
+		removeUserInfo() {
+			this.token = '';
+			this.openId = '';
+			this.isLogin = false;
+			this.userInfo = null;
+		},
+		setUserInfo(info: BizUserVo) {
+			this.userInfo = info;
+		},
+	},
+});

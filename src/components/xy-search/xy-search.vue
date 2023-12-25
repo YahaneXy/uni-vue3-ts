@@ -1,0 +1,289 @@
+<template>
+	<view class="flex flex-a">
+		<view
+			class="search"
+			:style="{ borderRadius: isShape, height: addUnit(height), backgroundColor: bcgColor, border: isBorder ? `solid 1rpx ${borderColor}` : '0rpx' }"
+		>
+			<template v-if="showLeft">
+				<image v-if="isImg(iconType)" style="width: 14px; height: 14px" :src="iconType"></image>
+				<icon v-else class="icon" :type="iconType" :size="addUnit(iconSize)" :color="iconColor"></icon>
+			</template>
+			<input
+				v-model="inputer"
+				type="text"
+				:placeholder="placeholder ? placeholder : '请输入内容'"
+				:placeholder-style="placeholderStyle"
+				@input="valueChange"
+				@confirm="onConfirm"
+				@focus="isFocus = true"
+				@blur="isFocus = false"
+			/>
+			<!-- <xy-input
+				v-model="inputer"
+				:style="['flex: 1', 'height: 80%', !isFocus && 'padding-right:20rpx !important']"
+				:placeholder="placeholder"
+				:placeholder-style="placeholderStyle"
+				:bcg-color="bcgColor"
+				:is-border="false"
+				:clearable="false"
+				height="100%"
+				@on-confirm="onConfirm"
+				@on-change="valueChange"
+				@focus="inputFocus"
+			></xy-input> -->
+			<view v-show="showClearIcon && inputer && isFocus" class="icon-clear flex flex-a" @click="clearInput">
+				<icon type="clear" :size="addUnit(clearIconSize)" :color="clearIconColor" />
+			</view>
+			<!-- 分割线 -->
+			<view v-if="showDivider" class="divider"></view>
+			<!-- 内部的搜索按钮 -->
+			<view
+				v-if="actionShow && !actionOutLayer"
+				class="search-action"
+				:style="actionStyle"
+				hover-class="search-action-hover"
+				hover-stay-time="100"
+				@click="onSearch"
+				>搜索</view
+			>
+		</view>
+		<!-- 外部的搜索按钮 -->
+		<view
+			v-if="actionShow && actionOutLayer"
+			class="search-action"
+			:style="actionStyle"
+			hover-class="search-action-hover"
+			hover-stay-time="100"
+			@click="onSearch"
+			>搜索</view
+		>
+	</view>
+</template>
+<script lang="ts" setup>
+// import type common from '@/utils/common';
+import { addStyle, addUnit } from '@/utils/function';
+import { isObject } from '@/utils/function/test';
+
+// const key = Symbol() as InjectionKey<typeof common>;
+
+// import xyInput from '../xy-input/xy-input.vue';
+// const $common = inject(key)!;
+// const $common = inject('$common') as CustomInterface.Common;
+const $common = inject<CustomInterface.Common>('$common')!;
+
+/**
+ * search 搜索框
+ * @description 简单的自定义搜索框
+ * @property {String}				modelValue				输入框绑定值
+ * @property {String}				bcgColor				背景色
+ * @property {String}				placeholder				占位文字内容（默认为“请输入内容”）
+ * @property {String}				placeholderStyle		占位文字样式，只支持字符串
+ * @property {Boolean}				showLeft				是否显示左侧图标
+ * @property {String}				iconColor				左侧图标颜色
+ * @property {String}				iconSize				左侧图标大小
+ * @property {String}				iconType				左侧图标，参照https://uniapp.dcloud.net.cn/component/icon.html#，可以是图片
+ * @property {String}				isBorder				是否显示border
+ * @property {String}				borderColor				border颜色
+ * @property {Boolean}				actionShow				是否显示右侧的“搜索”控件
+ * @property {Boolean}				showDivider				是否显示右侧控件的分割线
+ * @property {Boolean}				actionColor				右侧搜索控件颜色
+ * @property {Boolean}				actionOutLayer			右侧搜索控件是否显示在外侧
+ * @property {String|Object}		actionCustomStyle		右侧搜索控件的自定义样式
+ * @property {Boolean}				shape					search框的形状，square方形，round圆形
+ * @property {Boolean}				showClearIcon			是否显示清除按钮
+ * @property {Boolean}				clearIconColor			清除按钮的颜色
+ * @property {Boolean}				clearIconSize			清除按钮的大小
+ * @property {Number|String}		height					整体高度
+ *
+ * @event    #search search事件，用户触发回车或者点击输入框右下角的“搜索时”会触发，并将输入框中的内容返回回去
+ * @event    #clear  触发清除图标事件
+ * @event    #focus  聚焦、失焦时触发
+ */
+
+const props = withDefaults(
+	defineProps<{
+		modelValue: string;
+		bcgColor?: string;
+		placeholder?: string;
+		placeholderStyle?: string;
+		showLeft?: boolean;
+		iconColor?: string;
+		iconSize?: string | number;
+		iconType?: string;
+		isBorder?: boolean;
+		borderColor?: string;
+		// 右侧的搜索文字相关
+		actionShow?: boolean;
+		showDivider?: boolean;
+		actionOutLayer?: boolean;
+		actionCustomStyle?: string | object;
+		// 形状
+		shape?: 'square' | 'round';
+		// 是否显示清除
+		showClearIcon?: boolean;
+		clearIconColor?: string;
+		clearIconSize?: string | number;
+		height?: string | number;
+	}>(),
+	{
+		modelValue: '',
+		bcgColor: '#ffffff',
+		showLeft: true,
+		isBorder: true,
+		borderColor: '#cccccc',
+		// 右侧搜索
+		actionShow: true,
+		actionColor: '#000',
+		actionBorderColor: '#ccc',
+		actionOutLayer: false,
+		actionCustomStyle: '',
+		iconType: 'search',
+		iconColor: '#999',
+		shape: 'round',
+		placeholderStyle: 'color: #999999',
+		iconSize: 30,
+		showClearIcon: true,
+		clearIconColor: '#ccc',
+		clearIconSize: 30,
+		height: '64rpx',
+	}
+);
+const inputer = ref('');
+const isFocus = ref(false);
+const actionStyle = computed(() => {
+	const radius = props.shape === 'square' ? '10rpx' : '40rpx';
+	let style = {
+		borderRadius: `0 ${radius} ${radius} 0`,
+		height: props.height || '1.8rem',
+		lineHeight: props.height || '1.8rem',
+	};
+	if (props.actionOutLayer) {
+		const defaultActionStyle = {
+			border: 'solid 1rpx #ccc',
+			background: '#fff',
+			// height: '1.8rem',
+			// lineHeight: '1.8rem',
+			marginLeft: '10rpx',
+		};
+		style.borderRadius = '10rpx';
+		style = Object.assign(style, defaultActionStyle);
+	}
+	if (isObject(props.actionCustomStyle)) {
+		return addStyle($common.deepMerge(style, props.actionCustomStyle as object)) as string;
+	}
+	const custom = addStyle(props.actionCustomStyle as object) || {};
+	return $common.deepMerge(style, custom as object);
+});
+const isShape = computed(() => {
+	return props.shape === 'square' ? '10rpx' : '40rpx';
+});
+
+const emit = defineEmits<{
+	(e: 'search', value: string): void;
+	(e: 'update:modelValue', value: string): void;
+	(e: 'clear'): void;
+	(e: 'focus', value: boolean): void;
+}>();
+// 旧方法
+function valueChange(e: any) {
+	const value = (e as unknown as WechatMiniprogram.CustomEvent).detail.value;
+	emit('update:modelValue', value);
+}
+// function valueChange(value: string) {
+// 	emit('update:modelValue', value);
+// }
+// 旧方法
+function onConfirm(e: WechatMiniprogram.CustomEvent) {
+	emit('search', e.detail.value);
+}
+// function onConfirm(value: string) {
+// 	emit('search', value);
+// }
+
+function onSearch() {
+	emit('search', props.modelValue);
+}
+
+function clearInput() {
+	inputer.value = '';
+	emit('clear');
+	emit('update:modelValue', '');
+}
+
+// function inputFocus(focus: boolean) {
+// 	emit('focus', focus);
+// 	isFocus.value = focus;
+// }
+
+// 方法
+// 判断传入的name属性，是否图片路径，只要带有"/"均认为是图片形式
+function isImg(value: string) {
+	return value.indexOf('/') !== -1;
+}
+</script>
+<script lang="ts">
+export default {
+	name: 'XySearch',
+	// options: {
+	// 	styleIsolation: 'shared', // 启动样式隔离。当使用页面自定义组件，希望父组件影响子组件样式时可能需要配置。具体配置选项参见：微信小程序自定义组件的样式
+	// },
+};
+</script>
+<style lang="scss" scoped>
+.search {
+	display: flex;
+	align-items: center;
+	// height: 64rpx;
+	// background-color: v-bind('props.bcgColor');
+	padding-left: 20rpx;
+	width: 100%;
+	// border: solid #cccccc 1rpx;
+	// :deep(.xy-input) {
+	// 	padding: 0 !important;
+	// 	border-radius: 0 40rpx 40rpx 0 !important;
+	// 	// .icon-clear {
+	// 	// 	// padding: 0 20rpx;
+	// 	// 	padding-left: 20rpx;
+	// 	// }
+	// }
+	// .icon-clear {
+	// 	padding: 0 20rpx;
+	// 	height: 100%;
+	// }
+	// .pr20 {
+	// 	padding-right: 20rpx;
+	// }
+	.icon {
+		margin-right: 10rpx;
+	}
+	input {
+		// height: 2rem;
+		height: 100%;
+		font-size: 28rpx;
+		flex: 1;
+	}
+	.icon-clear {
+		// padding: 0 0 0 rpx;
+		padding-left: 20rpx;
+		height: 100%;
+	}
+}
+.search-action {
+	width: 90rpx;
+	// height: 2rem;
+	// line-height: 2rem;
+	text-align: center;
+	transition: all 50ms;
+}
+.search-action-hover {
+	background: #cccccc;
+	opacity: 0.75;
+}
+.divider {
+	margin-right: -0.5px;
+	height: 80%;
+	border-color: #004997 !important;
+	border-left-style: solid;
+	border-left-width: 0.5px !important;
+}
+</style>
