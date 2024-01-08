@@ -62,8 +62,8 @@ function deepMerge(target: AnyObject = {}, source: AnyObject = {}) {
  * @param {String} content - modal的内容
  * @param {String} type - default-默认:#77c146  danger-删除:#fa541c
  */
-function showModal(title: string, content: string, type = 'default'): Promise<boolean> {
-	return new Promise((resolve, reject) => {
+function showModal(title: string, content: string, type: 'default' | 'danger' = 'default', confirmText = '确认'): Promise<boolean> {
+	return new Promise((resolve /* , reject */) => {
 		const color: AnyObject = {
 			default: '#c73c00',
 			danger: '#fa541c',
@@ -72,14 +72,15 @@ function showModal(title: string, content: string, type = 'default'): Promise<bo
 		uni.showModal({
 			title,
 			content,
+			confirmText,
 			cancelColor: '#ccc',
 			confirmColor,
 			success: (res) => {
 				if (res.confirm) {
 					resolve(true);
-				} else if (res.cancel) {
+				} /* else if (res.cancel) {
 					reject(false);
-				}
+				} */
 			},
 		});
 	});
@@ -87,25 +88,27 @@ function showModal(title: string, content: string, type = 'default'): Promise<bo
 /**
  * 返回上一页
  */
-function navBack() {
+function navBack(delayTime: number) {
 	const pages = getCurrentPages();
 	const prevPage = pages[pages.length - 2]; // 上一个页面
 	// 判断上一页是否为首页，如果是就直接返回首页
 	if (prevPage?.route) {
-		uni.navigateBack({
-			delta: 1,
-			// 失败回调直接返回首页
-			fail: () => {
-				uni.reLaunch({
-					url: '/pages/index/index',
-				});
-			},
+		setTimeout(() => {
+			uni.navigateBack({
+				delta: 1,
+				// 失败回调直接返回首页
+				fail: () => {
+					uni.reLaunch({
+						url: '/pages/home/home',
+					});
+				},
+			});
+		}, delayTime);
+	} else {
+		uni.reLaunch({
+			url: '/pages/home/home',
 		});
-		return;
 	}
-	uni.reLaunch({
-		url: '/pages/index/index',
-	});
 }
 /**
  * 跳转

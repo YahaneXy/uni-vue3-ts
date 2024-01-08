@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import type { LoginParams } from '@/api/base';
 import { apiLogin, logout } from '@/api/base';
 import type { BizUserVo } from '@/api/personal/model/personalModel';
+import { getUserInfo } from '@/api/personal/personal';
 
 export const useUserStore = defineStore('user', {
 	state: () => {
@@ -24,6 +25,7 @@ export const useUserStore = defineStore('user', {
 			return apiLogin(params).then((res) => {
 				if (res.data) {
 					const { data } = res;
+					this.token = data;
 					this.openId = params.openId;
 					return data;
 				}
@@ -45,8 +47,11 @@ export const useUserStore = defineStore('user', {
 			this.isLogin = false;
 			this.userInfo = null;
 		},
-		setUserInfo(info: BizUserVo) {
-			this.userInfo = info;
+		setUserInfo() {
+			return getUserInfo().then((res) => {
+				// this.setUserInfo(res.data);
+				this.userInfo = res.data;
+			});
 		},
 	},
 });

@@ -1,5 +1,9 @@
 <template>
-	<view class="tabbar xy-border-top" :class="[position === 'bottom' && ['on-bottom', 'w100'], fixed && 'fiexd']" :style="{ background: background }">
+	<view
+		class="tabbar xy-border-top"
+		:class="[position === 'bottom' && ['on-bottom', 'w100'], fixed && 'fiexd']"
+		:style="{ background: background, zIndex }"
+	>
 		<view class="tab-content flex flex-a">
 			<view
 				v-for="(item, index) in barList"
@@ -12,6 +16,7 @@
 					class="x-center"
 					:class="[midButton && item.midButton ? ['mid-button'] : 'icon']"
 					:style="imgStyle"
+					mode="heightFix"
 					:src="index === currentIndex ? item.selectedIconPath : item.iconPath"
 				></image>
 				<view
@@ -77,6 +82,8 @@ interface TabbarProps {
 	switchDisabled?: boolean;
 	height?: string | number;
 	beforeSwitch?: () => boolean | Promise<boolean>;
+	imgMode: string;
+	zIndex: number | string;
 }
 const props = withDefaults(defineProps<TabbarProps>(), {
 	safeAreaInsetBottom: true,
@@ -88,9 +95,11 @@ const props = withDefaults(defineProps<TabbarProps>(), {
 	currentIndex: 0,
 	barList: () => tabBar.list,
 	inactiveColor: '#333333',
-	activeColor: '#004997',
+	activeColor: 'var(--color-6)',
 	background: '#ffffff',
 	height: '50px',
+	imgMode: 'scaleToFill',
+	zIndex: 1,
 });
 
 const midButton = ref(props.barList.filter((v) => v.midButton).length > 0);
@@ -156,7 +165,6 @@ export default {
 
 <style lang="scss" scoped>
 .tabbar {
-	z-index: 1000;
 	// min-height: 50px;
 	height: auto;
 	.tab-content {
@@ -166,7 +174,7 @@ export default {
 		.tab-item {
 			// text-align: center;
 			position: relative;
-			z-index: 10;
+			// z-index: 10;
 			height: 100%;
 			background: v-bind('props.background');
 			.icon {

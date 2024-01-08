@@ -28,11 +28,7 @@
 
 <script lang="ts" setup>
 import type { LoginParams } from '@/api/base';
-import { getUserInfo } from '@/api/personal/personal';
-// import { apiLogin } from '@/api/base';
-import { useUserStore } from '@/store/user/index';
-// import cache from '@/utils/cache';
-// import common from '@/utils/common';
+import { useUserStore } from '@/store/user';
 import { request } from '@/utils/request';
 
 interface Openid {
@@ -125,8 +121,7 @@ async function loginNew() {
 // 登录成功后执行的操作
 function afterLogin(token: string) {
 	user.saveLoginData(token);
-	getUserInfo().then((res) => {
-		user.setUserInfo(res.data);
+	user.setUserInfo().then(() => {
 		uni.hideLoading();
 		$common.toast('登录成功!');
 		setTimeout(() => {

@@ -127,3 +127,25 @@ export function timeFormat(dateTime: Date | null | string, formatStr = 'yyyy-mm-
 
 	return formatStr;
 }
+
+/**
+ * 简化获取元素信息的方法
+ * @param el 元素的样式
+ * @param all 获取全部或单个
+ */
+export function queryRect(el: string, all?: boolean, instance?: any): Promise<WechatMiniprogram.BoundingClientRectCallbackResult> {
+	return new Promise((resolve) => {
+		let query: UniNamespace.SelectorQuery | null = null;
+		if (instance) {
+			query = uni.createSelectorQuery().in(instance);
+		} else {
+			query = uni.createSelectorQuery();
+		}
+		query[all ? 'selectAll' : 'select'](el)
+			// .select(el)
+			.boundingClientRect((rect) => {
+				resolve(rect as WechatMiniprogram.BoundingClientRectCallbackResult);
+			})
+			.exec();
+	});
+}

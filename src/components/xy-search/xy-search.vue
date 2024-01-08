@@ -13,6 +13,9 @@
 				type="text"
 				:placeholder="placeholder ? placeholder : '请输入内容'"
 				:placeholder-style="placeholderStyle"
+				:style="{
+					color,
+				}"
 				@input="valueChange"
 				@confirm="onConfirm"
 				@focus="isFocus = true"
@@ -35,7 +38,7 @@
 				<icon type="clear" :size="addUnit(clearIconSize)" :color="clearIconColor" />
 			</view>
 			<!-- 分割线 -->
-			<view v-if="showDivider" class="divider"></view>
+			<view v-if="showDivider" class="divider" :style="dividerStyle"></view>
 			<!-- 内部的搜索按钮 -->
 			<view
 				v-if="actionShow && !actionOutLayer"
@@ -76,6 +79,7 @@ const $common = inject<CustomInterface.Common>('$common')!;
  * @description 简单的自定义搜索框
  * @property {String}				modelValue				输入框绑定值
  * @property {String}				bcgColor				背景色
+ * @property {String}				color					字体颜色
  * @property {String}				placeholder				占位文字内容（默认为“请输入内容”）
  * @property {String}				placeholderStyle		占位文字样式，只支持字符串
  * @property {Boolean}				showLeft				是否显示左侧图标
@@ -86,6 +90,8 @@ const $common = inject<CustomInterface.Common>('$common')!;
  * @property {String}				borderColor				border颜色
  * @property {Boolean}				actionShow				是否显示右侧的“搜索”控件
  * @property {Boolean}				showDivider				是否显示右侧控件的分割线
+ * @property {Boolean}				dividerColor			右侧分割线颜色
+ * @property {Boolean}				dividerCustomStyle		右侧分割线自定义样式
  * @property {Boolean}				actionColor				右侧搜索控件颜色
  * @property {Boolean}				actionOutLayer			右侧搜索控件是否显示在外侧
  * @property {String|Object}		actionCustomStyle		右侧搜索控件的自定义样式
@@ -104,19 +110,28 @@ const props = withDefaults(
 	defineProps<{
 		modelValue: string;
 		bcgColor?: string;
+		color?: string;
 		placeholder?: string;
 		placeholderStyle?: string;
 		showLeft?: boolean;
 		iconColor?: string;
 		iconSize?: string | number;
+		/** 图标类型，支持类型https://uniapp.dcloud.net.cn/component/icon.html */
 		iconType?: string;
+		/** 显示边框 */
 		isBorder?: boolean;
+		/** 边框颜色 */
 		borderColor?: string;
-		// 右侧的搜索文字相关
+		/** 显示搜索 */
 		actionShow?: boolean;
-		showDivider?: boolean;
+		/** 搜索按钮字体颜色 */
+		actionColor?: string;
 		actionOutLayer?: boolean;
 		actionCustomStyle?: string | object;
+		// 右侧分割线
+		showDivider?: boolean;
+		dividerColor?: string;
+		dividerCustomStyle?: CSSProperties;
 		// 形状
 		shape?: 'square' | 'round';
 		// 是否显示清除
@@ -128,6 +143,7 @@ const props = withDefaults(
 	{
 		modelValue: '',
 		bcgColor: '#ffffff',
+		color: '#000',
 		showLeft: true,
 		isBorder: true,
 		borderColor: '#cccccc',
@@ -137,6 +153,8 @@ const props = withDefaults(
 		actionBorderColor: '#ccc',
 		actionOutLayer: false,
 		actionCustomStyle: '',
+		// 右侧分割线
+		dividerColor: '#000',
 		iconType: 'search',
 		iconColor: '#999',
 		shape: 'round',
@@ -156,6 +174,7 @@ const actionStyle = computed(() => {
 		borderRadius: `0 ${radius} ${radius} 0`,
 		height: props.height || '1.8rem',
 		lineHeight: props.height || '1.8rem',
+		color: props.actionColor,
 	};
 	if (props.actionOutLayer) {
 		const defaultActionStyle = {
@@ -176,6 +195,17 @@ const actionStyle = computed(() => {
 });
 const isShape = computed(() => {
 	return props.shape === 'square' ? '10rpx' : '40rpx';
+});
+
+const dividerStyle = computed(() => {
+	const style: CSSProperties = {
+		borderColor: props.dividerColor,
+	};
+	if (isObject(props.dividerCustomStyle)) {
+		return addStyle($common.deepMerge(style, props.dividerCustomStyle as object)) as string;
+	}
+	const custom = addStyle(props.dividerCustomStyle as object) || {};
+	return $common.deepMerge(style, custom as object);
 });
 
 const emit = defineEmits<{
@@ -282,7 +312,7 @@ export default {
 .divider {
 	margin-right: -0.5px;
 	height: 80%;
-	border-color: #004997 !important;
+	// border-color: #004997 !important;
 	border-left-style: solid;
 	border-left-width: 0.5px !important;
 }

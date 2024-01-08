@@ -1,4 +1,4 @@
-import { useUserStore } from '@/store/user/index';
+import { useUserStore } from '@/store/user';
 
 // import cache from './cache';
 import common from './common';
