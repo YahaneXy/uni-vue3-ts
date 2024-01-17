@@ -2,7 +2,7 @@
 	<view
 		class="tabbar xy-border-top"
 		:class="[position === 'bottom' && ['on-bottom', 'w100'], fixed && 'fiexd']"
-		:style="{ background: background, zIndex }"
+		:style="{ background: background, zIndex, opacity: loaded ? 1 : 0, transition: 'all 500ms' }"
 	>
 		<view class="tab-content flex flex-a">
 			<view
@@ -52,7 +52,8 @@
  * @property {string}				inactiveColor			未激活的颜色
  * @property {string}				background				背景色
  * @property {boolean}				switchDisabled			是否禁止跳转
- * @property {boolean | number}		height			是否禁止跳转
+ * @property {boolean | number}		height					是否禁止跳转
+ * @property {boolean}				fadeInAnime				显示加载时的过度动画
  * @event beforeSwitch 切换页面前的事件，必须返回一个布尔值，为true时才允许切换
  */
 
@@ -84,6 +85,7 @@ interface TabbarProps {
 	beforeSwitch?: () => boolean | Promise<boolean>;
 	imgMode: string;
 	zIndex: number | string;
+	fadeInAnime: boolean;
 }
 const props = withDefaults(defineProps<TabbarProps>(), {
 	safeAreaInsetBottom: true,
@@ -100,7 +102,15 @@ const props = withDefaults(defineProps<TabbarProps>(), {
 	height: '50px',
 	imgMode: 'scaleToFill',
 	zIndex: 1,
+	fadeInAnime: false,
 });
+
+onLoad(() => {
+	getMidButtonLeft();
+	loaded.value = true;
+});
+
+const loaded = ref(false);
 
 const midButton = ref(props.barList.filter((v) => v.midButton).length > 0);
 // 大图标居中值，需要同时跟css设置，否则位置会有偏差
@@ -132,9 +142,7 @@ const iconStyle = computed(() => {
 	return customStyle;
 });
 const barHeight = computed(() => addUnit(props.height));
-onMounted(() => {
-	getMidButtonLeft();
-});
+
 function getMidButtonLeft() {
 	const windowWidth = uni.getSystemInfoSync().windowWidth;
 	midButtonLeft.value = windowWidth / 2 + 'px';

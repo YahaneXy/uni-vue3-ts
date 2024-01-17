@@ -1,5 +1,8 @@
 @charset "UTF-8";
 page {
+	/* stylelint-disable-next-line property-no-vendor-prefix */
+	-webkit-animation: fade-in 0.5s ease both;
+	animation: fade-in 0.5s ease both;
 	height: 100%;
 	font-size: 28rpx;
 	font-family: Arial, 'Helvetica Neue', Helvetica, 'Microsoft YaHei', '微软雅黑', Tohoma, sans-serif;
@@ -21,6 +24,30 @@ page {
 	// 字体通用颜色
 	--color-f: #7dba00;
 	--common-radis: 16rpx;
+}
+/* stylelint-disable-next-line at-rule-no-vendor-prefix */
+@-webkit-keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+/* stylelint-disable-next-line at-rule-no-vendor-prefix */
+@-webkit-keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
 }
 view,
 text,
@@ -86,6 +113,9 @@ button {
 }
 .w100 {
 	width: 100%;
+}
+.w0 {
+	width: 0;
 }
 .h100 {
 	height: 100%;
