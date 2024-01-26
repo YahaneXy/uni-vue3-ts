@@ -1,4 +1,4 @@
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 
 // import cache from './cache';
 import common from './common';
@@ -115,6 +115,7 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 						});
 					}, 1000);
 					errorToast('请先登录');
+					reject(new Error('未登录'));
 				} else if (code === 500) {
 					uni.showToast({
 						title: message || 'unknow error',

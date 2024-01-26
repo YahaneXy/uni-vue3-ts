@@ -5,6 +5,11 @@ export interface LoginParams {
 	code: string;
 	tenantId: string;
 }
+export interface LoginInfo {
+	openId: string;
+	unionId: string;
+	token?: string;
+}
 export interface BaseEntity {
 	/** 分页页码 */
 	pageNum?: number;

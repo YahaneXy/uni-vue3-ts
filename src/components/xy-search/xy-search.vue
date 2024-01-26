@@ -34,7 +34,7 @@
 				@on-change="valueChange"
 				@focus="inputFocus"
 			></xy-input> -->
-			<view v-show="showClearIcon && inputer && isFocus" class="icon-clear flex flex-a" @click="clearInput">
+			<view v-show="showClearIcon && inputer && keepClearShow ? true : isFocus" class="icon-clear flex flex-a" @click="clearInput">
 				<icon type="clear" :size="addUnit(clearIconSize)" :color="clearIconColor" />
 			</view>
 			<!-- 分割线 -->
@@ -99,6 +99,7 @@ const $common = inject<CustomInterface.Common>('$common')!;
  * @property {Boolean}				showClearIcon			是否显示清除按钮
  * @property {Boolean}				clearIconColor			清除按钮的颜色
  * @property {Boolean}				clearIconSize			清除按钮的大小
+ * @property {Boolean}				keepClearShow			只要有文本内容，就保持显示清除按钮，无需聚焦
  * @property {Number|String}		height					整体高度
  *
  * @event    #search search事件，用户触发回车或者点击输入框右下角的“搜索时”会触发，并将输入框中的内容返回回去
@@ -138,6 +139,7 @@ const props = withDefaults(
 		showClearIcon?: boolean;
 		clearIconColor?: string;
 		clearIconSize?: string | number;
+		keepClearShow?: boolean;
 		height?: string | number;
 	}>(),
 	{
@@ -294,7 +296,8 @@ export default {
 	}
 	.icon-clear {
 		// padding: 0 0 0 rpx;
-		padding-left: 20rpx;
+		// padding-left: 20rpx;
+		padding: 10rpx;
 		height: 100%;
 	}
 }

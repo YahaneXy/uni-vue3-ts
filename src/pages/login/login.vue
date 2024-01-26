@@ -27,19 +27,9 @@
 </template>
 
 <script lang="ts" setup>
-import type { LoginParams } from '@/api/base';
-import { useUserStore } from '@/store/user';
+import type { LoginInfo, LoginParams } from '@/api/base';
+import { useUserStore } from '@/stores/user';
 import { request } from '@/utils/request';
-
-interface Openid {
-	openId: string;
-	unionId: string;
-}
-interface LoginInfo {
-	openId: string;
-	unionId: string;
-	token?: string;
-}
 
 const $common = inject<CustomInterface.Common>('$common')!;
 
@@ -54,7 +44,7 @@ onLoad((options) => {
 	forward.value = options?.forward ? decodeURIComponent(options.forward) : '';
 });
 
-function getUserOpenId(): Promise<Openid> {
+function getUserOpenId(): Promise<LoginInfo> {
 	return new Promise((resolve, reject) => {
 		uni.login({
 			success(res) {
@@ -96,7 +86,14 @@ function getPhoneNumber(e: WechatMiniprogram.ButtonGetPhoneNumber) {
 			code: e.detail.code,
 			tenantId: '000000',
 		};
-		user.login(params);
+		user.login(params).then((res) => {
+			const loginInfo: LoginInfo = {
+				openId,
+				unionId,
+				token: res,
+			};
+			afterLogin(loginInfo);
+		});
 	});
 }
 
@@ -112,22 +109,18 @@ async function loginNew() {
 	});
 	loginInfo.value = await getUserOpenId();
 	if (loginInfo.value.token) {
-		afterLogin(loginInfo.value.token);
+		afterLogin(loginInfo.value);
 	} else {
 		popup.value.open();
 	}
 }
 
 // 登录成功后执行的操作
-function afterLogin(token: string) {
-	user.saveLoginData(token);
-	user.setUserInfo().then(() => {
-		uni.hideLoading();
-		$common.toast('登录成功!');
-		setTimeout(() => {
-			$common.navBack();
-		}, 200);
-	});
+function afterLogin(loginInfo: LoginInfo) {
+	user.saveLoginData(loginInfo);
+	uni.hideLoading();
+	$common.toast('登录成功!');
+	$common.navBack(200);
 }
 </script>
 

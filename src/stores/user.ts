@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import type { LoginParams } from '@/api/base';
+import type { LoginInfo, LoginParams } from '@/api/base';
 import { apiLogin, logout } from '@/api/base';
 import type { BizUserVo } from '@/api/personal/model/personalModel';
 import { getUserInfo } from '@/api/personal/personal';
@@ -32,8 +32,9 @@ export const useUserStore = defineStore('user', {
 			});
 		},
 		// 如果后端有token缓存，就直接走这一步
-		saveLoginData(token: string) {
-			this.token = token;
+		saveLoginData(loginInfo: LoginInfo) {
+			this.token = loginInfo.token!;
+			this.openId = loginInfo.openId;
 			this.isLogin = true;
 		},
 		logout() {
