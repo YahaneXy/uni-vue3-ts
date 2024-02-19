@@ -7,11 +7,13 @@ import { createSSRApp } from 'vue';
 import App from './App.vue';
 import cache from './utils/cache';
 import common from './utils/common';
+// import shareMixin from './utils/shareMixin';
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 export function createApp() {
 	const app = createSSRApp(App);
 	app.use(pinia);
+	// app.mixin(shareMixin);
 	app.provide('$common', common);
 	app.provide('$cache', cache);
 	// app.config.globalProperties.$common = common;
