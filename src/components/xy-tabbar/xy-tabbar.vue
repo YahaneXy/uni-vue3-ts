@@ -5,35 +5,37 @@
 		:style="{ background: background, zIndex, opacity: loaded ? 1 : 0, transition: 'all 500ms' }"
 	>
 		<view class="tab-content flex flex-a">
-			<view
-				v-for="(item, index) in barList"
-				:key="item.pagePath"
-				class="tab-item flex flex-dr flex-jc-sb flex1"
-				:style="{ top: top }"
-				@click="switchTab(item, index)"
-			>
-				<image
-					class="x-center"
-					:class="[midButton && item.midButton ? ['mid-button'] : 'icon']"
-					:style="imgStyle"
-					mode="heightFix"
-					:src="index === currentIndex ? item.selectedIconPath : item.iconPath"
-				></image>
+			<slot>
 				<view
-					class="text x-center"
-					:style="{ color: index === currentIndex ? activeColor : inactiveColor, fontWeight: index === currentIndex ? 'bold' : 400, ...iconStyle }"
-					>{{ item.text }}</view
+					v-for="(item, index) in barList"
+					:key="item.pagePath"
+					class="tab-item flex flex-dr flex-jc-sb flex1"
+					:style="{ top: top }"
+					@click="switchTab(item, index)"
 				>
-			</view>
-			<view
-				v-if="midButton"
-				class="mid-border xy-border"
-				:style="{
-					backgroundColor: background,
-					left: midButtonLeft,
-				}"
-			>
-			</view>
+					<image
+						class="x-center"
+						:class="[midButton && item.midButton ? ['mid-button'] : 'icon']"
+						:style="imgStyle"
+						mode="heightFix"
+						:src="index === currentIndex ? item.selectedIconPath : item.iconPath"
+					></image>
+					<view
+						class="text x-center"
+						:style="{ color: index === currentIndex ? activeColor : inactiveColor, fontWeight: index === currentIndex ? 'bold' : 400, ...iconStyle }"
+						>{{ item.text }}</view
+					>
+				</view>
+				<view
+					v-if="midButton"
+					class="mid-border xy-border"
+					:style="{
+						backgroundColor: background,
+						left: midButtonLeft,
+					}"
+				>
+				</view>
+			</slot>
 		</view>
 		<view v-if="safeAreaInsetBottom" class="safe-bottom"></view>
 	</view>
@@ -56,6 +58,8 @@
  * @property {boolean}				fadeInAnime				显示加载时的过度动画
  * @event beforeSwitch 切换页面前的事件，必须返回一个布尔值，为true时才允许切换
  */
+
+import type { CSSProperties } from 'vue';
 
 import { tabBar } from '@/pages.json';
 import { addUnit } from '@/utils/function';
@@ -84,7 +88,7 @@ interface TabbarProps {
 	height?: string | number;
 	beforeSwitch?: () => boolean | Promise<boolean>;
 	imgMode: string;
-	zIndex: number | string;
+	zIndex: number;
 	fadeInAnime: boolean;
 }
 const props = withDefaults(defineProps<TabbarProps>(), {
@@ -104,8 +108,7 @@ const props = withDefaults(defineProps<TabbarProps>(), {
 	zIndex: 1,
 	fadeInAnime: false,
 });
-
-onLoad(() => {
+onMounted(() => {
 	getMidButtonLeft();
 	loaded.value = true;
 });
@@ -117,28 +120,15 @@ const midButton = ref(props.barList.filter((v) => v.midButton).length > 0);
 const midButtonLeft = ref('50%');
 
 const imgStyle = computed(() => {
-	const customStyle = <
-		{
-			width?: string;
-			height?: string;
-			[index: string]: string | undefined;
-		}
-	>{};
+	const customStyle = <CSSProperties>{};
 	customStyle.width = addUnit(props.iconSize);
 	customStyle.height = addUnit(props.iconSize);
 	return customStyle;
 });
 const iconStyle = computed(() => {
-	interface Style {
-		fontSize?: string;
-		lineHeight?: string;
-		fontWeight?: string;
-		[index: string]: string | undefined;
-	}
-	const customStyle: Style = {};
+	const customStyle: CSSProperties = {};
 	customStyle.fontSize = addUnit(props.fontSize);
 	customStyle.lineHeight = addUnit(props.fontSize);
-	// customStyle.fontWeight = 'normal';
 	return customStyle;
 });
 const barHeight = computed(() => addUnit(props.height));

@@ -5,6 +5,8 @@ import { apiLogin, logout } from '@/api/base';
 import type { BizUserVo } from '@/api/personal/model/personalModel';
 import { getUserInfo } from '@/api/personal/personal';
 
+import store from '.';
+
 export const useUserStore = defineStore('user', {
 	state: () => {
 		return {
@@ -56,3 +58,7 @@ export const useUserStore = defineStore('user', {
 		},
 	},
 });
+// 如果要直接在ts文件的根区域下使用，则导入这个
+export function getUserStore() {
+	return useUserStore(store);
+}
