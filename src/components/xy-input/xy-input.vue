@@ -6,6 +6,7 @@
 	>
 		<input
 			v-model="inputer"
+			class="input"
 			type="text"
 			:style="{ height: addUnit(height) }"
 			:placeholder="placeholder ? placeholder : '请输入内容'"
@@ -128,7 +129,7 @@ function blur() {
 	display: flex;
 	align-items: center;
 	width: 100%;
-	input {
+	.input {
 		// height: 2rem;
 		font-size: 28rpx;
 		flex: 1;

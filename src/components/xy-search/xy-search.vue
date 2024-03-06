@@ -10,6 +10,7 @@
 			</template>
 			<input
 				v-model="inputer"
+				class="input"
 				type="text"
 				:placeholder="placeholder ? placeholder : '请输入内容'"
 				:placeholder-style="placeholderStyle"
@@ -288,7 +289,7 @@ export default {
 	.icon {
 		margin-right: 10rpx;
 	}
-	input {
+	.input {
 		// height: 2rem;
 		height: 100%;
 		font-size: 28rpx;

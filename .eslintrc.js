@@ -42,10 +42,10 @@ module.exports = {
 	},
 	plugins: ['vue', '@typescript-eslint', 'simple-import-sort'],
 	rules: {
+		'@typescript-eslint/consistent-type-imports': 'error', // 导入的类型如果仅仅是类型，不使用import type则会报错
 		'no-undef': 0, //https://github.com/unplugin/unplugin-auto-import:当使用TypeScript时，我们建议直接禁用 no-undef 规则，因为TypeScript已经检查过它们了，你不需要担心这一点
 		'@typescript-eslint/restrict-template-expressions': 'off',
 		'@typescript-eslint/restrict-plus-operands': 'off', //要求加法的两个操作数都是相同的类型，并且是 bigint 、 number 或 string
-		'@typescript-eslint/consistent-type-imports': 'off', // 强制类型导出的一致使用，不关闭自定义的typings会报错。
 		'@typescript-eslint/prefer-nullish-coalescing': 'off', // 允许使用||而不是强制要求??
 		'@typescript-eslint/promise-function-async': 'off',
 		'prefer-promise-reject-errors': 'off', // 不要求reject使用Error类型

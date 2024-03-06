@@ -1,5 +1,6 @@
 {
 	"extends": "@vue/tsconfig/tsconfig.json",
+	"$schema": "http://json-schema.org/draft-04/schema#",
 	"compilerOptions": {
 		"sourceMap": true,
 		"baseUrl": ".",
@@ -9,7 +10,7 @@
 		},
 		"lib": ["esnext", "dom"],
 		"types": ["@dcloudio/types", "miniprogram-api-typings", "node"],
-		"verbatimModuleSyntax": true,
+		// "verbatimModuleSyntax": true, // 因为在tslint中提供了解决方式，因此采用tslint的方式
 		"ignoreDeprecations": "5.0"
 	},
 	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
