@@ -60,12 +60,22 @@ module.exports = {
 		'vue/multi-word-component-names': 'off', // 取消该项，否则template报错
 		'vue/require-default-prop': 'off', // 取消组件要求默认值
 		quotes: ['error', 'single'],
+		// 允许使用局部变量接收this
+		'@typescript-eslint/no-this-alias': ['off'],
 		// 允许使用显式的any
 		'@typescript-eslint/no-explicit-any': ['off'],
 		'@typescript-eslint/no-non-null-assertion': ['off'],
 		'simple-import-sort/imports': 'error', // 插件，导包顺序
 		'simple-import-sort/exports': 'error',
 		'vue/attributes-order': 'error', // 设置vue标签的循序（v-if，v-model等）
+		'vue/component-name-in-template-casing': [
+			// 要求引用组件时使用kebab-case
+			'error',
+			'kebab-case',
+			{
+				registeredComponentsOnly: false,
+			},
+		],
 		'prefer-const': [
 			// 没有改变的变量要用const声明
 			'error',

@@ -1,16 +1,20 @@
 <template>
-	<view
-		class="tabbar xy-border-top"
-		:class="[position === 'bottom' && ['on-bottom', 'w100'], fixed && 'fiexd']"
-		:style="{ background: background, zIndex, opacity: loaded ? 1 : 0, transition: 'all 500ms' }"
-	>
-		<view class="tab-content flex flex-a">
-			<slot>
+	<view>
+		<view v-if="fillArea" class="tabbar-fill">
+			<view :style="{ height: barHeight }"></view>
+			<view v-if="safeAreaInsetBottom" class="safe-bottom"></view>
+		</view>
+		<view
+			class="tabbar xy-border-top"
+			:class="[position === 'bottom' && ['on-bottom', 'w100'], fixed && 'fiexd']"
+			:style="{ background: background, zIndex, opacity: loaded ? 1 : 0, transition: 'all 500ms' }"
+		>
+			<view class="tab-content flex flex-a" :style="{ height: barHeight }">
 				<view
 					v-for="(item, index) in barList"
 					:key="item.pagePath"
 					class="tab-item flex flex-dr flex-jc-sb flex1"
-					:style="{ top: top }"
+					:style="{ top: top, background: background }"
 					@click="switchTab(item, index)"
 				>
 					<image
@@ -31,13 +35,13 @@
 					class="mid-border xy-border"
 					:style="{
 						backgroundColor: background,
-						left: midButtonLeft,
+						left: midButtonLeft ?? 0,
 					}"
 				>
 				</view>
-			</slot>
+			</view>
+			<view v-if="safeAreaInsetBottom" class="safe-bottom"></view>
 		</view>
-		<view v-if="safeAreaInsetBottom" class="safe-bottom"></view>
 	</view>
 </template>
 <script lang="ts" setup>
@@ -56,6 +60,7 @@
  * @property {boolean}				switchDisabled			是否禁止跳转
  * @property {boolean | number}		height					是否禁止跳转
  * @property {boolean}				fadeInAnime				显示加载时的过度动画
+ * @property {boolean}				fillArea				底部填充区域，填充高度相当于tabbar高度
  * @event beforeSwitch 切换页面前的事件，必须返回一个布尔值，为true时才允许切换
  */
 
@@ -87,9 +92,10 @@ interface TabbarProps {
 	switchDisabled?: boolean;
 	height?: string | number;
 	beforeSwitch?: () => boolean | Promise<boolean>;
-	imgMode: string;
-	zIndex: number;
-	fadeInAnime: boolean;
+	imgMode?: string;
+	zIndex?: number | string;
+	fadeInAnime?: boolean;
+	fillArea?: boolean;
 }
 const props = withDefaults(defineProps<TabbarProps>(), {
 	safeAreaInsetBottom: true,
@@ -107,13 +113,16 @@ const props = withDefaults(defineProps<TabbarProps>(), {
 	imgMode: 'scaleToFill',
 	zIndex: 1,
 	fadeInAnime: false,
+	fillArea: true,
 });
+
 onMounted(() => {
 	getMidButtonLeft();
 	loaded.value = true;
 });
 
 const loaded = ref(false);
+const barHeight = computed(() => addUnit(props.height));
 
 const midButton = ref(props.barList.filter((v) => v.midButton).length > 0);
 // 大图标居中值，需要同时跟css设置，否则位置会有偏差
@@ -131,7 +140,6 @@ const iconStyle = computed(() => {
 	customStyle.lineHeight = addUnit(props.fontSize);
 	return customStyle;
 });
-const barHeight = computed(() => addUnit(props.height));
 
 function getMidButtonLeft() {
 	const windowWidth = uni.getSystemInfoSync().windowWidth;
@@ -155,11 +163,11 @@ async function switchTab(item: BarList, index: number) {
 	});
 }
 </script>
-<script lang="ts">
+<!-- <script lang="ts">
 export default {
 	name: 'XyTabbar',
 };
-</script>
+</script> -->
 
 <style lang="scss" scoped>
 .tabbar {
@@ -167,14 +175,9 @@ export default {
 	height: auto;
 	.tab-content {
 		position: relative;
-		// height: 50px;
-		height: v-bind(barHeight);
 		.tab-item {
-			// text-align: center;
 			position: relative;
-			// z-index: 10;
 			height: 100%;
-			background: v-bind('props.background');
 			.icon {
 				top: 14rpx;
 			}

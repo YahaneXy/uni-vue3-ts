@@ -79,6 +79,9 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 			const Auth = { UserAuthorization: 'Bearer' + ' ' + token };
 			config.headers = common.deepMerge(config.headers, Auth);
 		}
+		if ((config.isJson === undefined && config.method?.toUpperCase() === 'POST') || config.method?.toUpperCase() === 'PUT') {
+			config.isJson = true;
+		}
 		// 是否json请求
 		if (config.isJson) {
 			config.headers!['content-type'] = 'application/json';

@@ -1,6 +1,6 @@
 <template>
 	<view class="xy-tabs" :class="[isBorder && ['xy-border-bottom', 'xy-border-top']]" :style="{ ...tabStyle }">
-		<scroll-view scroll-with-animation :scroll-x="scrollable" :scroll-animation-duration="240" :show-scrollbar="false">
+		<scroll-view scroll-with-animation :scroll-x="scrollable" :scroll-animation-duration="240" enhanced :show-scrollbar="false">
 			<view class="tabs-item" :class="{ flex: !scrollable, 'tabs-scroll': scrollable }">
 				<view
 					v-for="(tab, index) in tabs"
@@ -30,6 +30,8 @@
  * @property {string}				bcgColor	整体背景色，默认以父节点为准
  * @property {string}				lineColor   下划线的颜色
  * */
+import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
+
 import { addStyle, addUnit } from '@/utils/function';
 const instance = getCurrentInstance();
 interface Obj {
@@ -183,11 +185,11 @@ export default {
 	height: v-bind(heightVal);
 	background-color: v-bind('props.bcgColor');
 	// 隐藏滚动条
-	::-webkit-scrollbar {
-		display: none;
-		width: 0 !important;
-		height: 0 !important;
-	}
+	// ::-webkit-scrollbar {
+	// 	display: none;
+	// 	width: 0 !important;
+	// 	height: 0 !important;
+	// }
 	.tabs-item {
 		position: relative;
 		white-space: nowrap;
