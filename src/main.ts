@@ -9,7 +9,7 @@ import App from './App.vue';
 // pinia.use(piniaPluginPersistedstate);
 import { store } from './stores';
 import cache from './utils/cache';
-import common from './utils/common';
+import * as common from './utils/common';
 // import shareMixin from './utils/shareMixin';
 // const pinia = createPinia();
 // pinia.use(piniaPluginPersistedstate);

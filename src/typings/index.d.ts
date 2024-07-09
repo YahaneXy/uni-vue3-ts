@@ -1,5 +1,5 @@
-import type CacheUtils from '@/utils/cache';
-import type CommonUtils from '@/utils/common';
+import type * as CacheUtils from '@/utils/cache';
+import type * as CommonUtils from '@/utils/common';
 
 declare global {
 	namespace CustomInterface {

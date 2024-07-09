@@ -1,5 +1,5 @@
 import manifest from '../manifest.json';
-const config = {
+export const config = {
 	appid: manifest['mp-weixin'].appid,
 	url: 'http://192.168.0.79:8080',
 };
@@ -7,7 +7,7 @@ if (process.env.NODE_ENV === 'development') {
 	// 开发环境
 	config.url = 'http://192.168.0.79:8080';
 }
-function deepClone<T>(obj: T | T[]): T | T[] {
+export function deepClone<T>(obj: T | T[]): T | T[] {
 	// 对常见的“非”值，直接返回原来值
 	if (!obj) return obj;
 	if (typeof obj !== 'object' /*  && typeof obj !== 'function' */) {
@@ -31,7 +31,7 @@ function deepClone<T>(obj: T | T[]): T | T[] {
  * @param source
  * @returns
  */
-function deepMerge(target: AnyObject = {}, source: AnyObject = {}) {
+export function deepMerge(target: AnyObject = {}, source: AnyObject = {}) {
 	target = deepClone(target);
 	if (typeof target !== 'object' || typeof source !== 'object') return {};
 	for (const prop in source) {
@@ -62,7 +62,7 @@ function deepMerge(target: AnyObject = {}, source: AnyObject = {}) {
  * @param {String} content - modal的内容
  * @param {String} type - default-默认:#77c146  danger-删除:#fa541c
  */
-function showModal(title: string, content: string, type: 'default' | 'danger' = 'default', confirmText = '确认'): Promise<boolean> {
+export function showModal(title: string, content: string, type: 'default' | 'danger' = 'default', confirmText = '确认'): Promise<boolean> {
 	return new Promise((resolve /* , reject */) => {
 		const color: AnyObject = {
 			default: '#c73c00',
@@ -88,7 +88,7 @@ function showModal(title: string, content: string, type: 'default' | 'danger' = 
 /**
  * 返回上一页
  */
-function navBack(delayTime: number) {
+export function navBack(delayTime: number) {
 	const pages = getCurrentPages();
 	const prevPage = pages[pages.length - 2]; // 上一个页面
 	// 判断上一页是否为首页，如果是就直接返回首页
@@ -99,7 +99,7 @@ function navBack(delayTime: number) {
 				// 失败回调直接返回首页
 				fail: () => {
 					uni.reLaunch({
-						url: '/pages/home/home',
+						url: '/pages/index/index',
 					});
 				},
 			});
@@ -114,7 +114,7 @@ function navBack(delayTime: number) {
  * 跳转
  * @param url
  */
-function navTo(url: string) {
+export function navTo(url: string) {
 	uni.navigateTo({ url });
 }
 /**
@@ -123,7 +123,7 @@ function navTo(url: string) {
  * @param duration
  * @param mask
  */
-function toast(title: string, duration = 1500, mask = false) {
+export function toast(title: string, duration = 1500, mask = false) {
 	uni.showToast({
 		title,
 		icon: 'none',
@@ -134,7 +134,7 @@ function toast(title: string, duration = 1500, mask = false) {
 /**
  * 检测新版本
  */
-function checkNewVersion() {
+export function checkNewVersion() {
 	const updateManager = uni.getUpdateManager();
 	updateManager.onCheckForUpdate((res) => {
 		console.log('是否有新版本', res.hasUpdate);
@@ -153,7 +153,7 @@ function checkNewVersion() {
  * 保存图片，如果传入的是一个字符串则使用函数体内的保存，如果传入函数则执行函数
  * @param {String|Function} targetImage
  */
-function saveImage(targetImage: string | (() => void)) {
+export function saveImage(targetImage: string | (() => void)) {
 	uni.getSetting({
 		success: (res) => {
 			const writable = res.authSetting['scope.writePhotosAlbum'];
@@ -199,14 +199,14 @@ function saveImage(targetImage: string | (() => void)) {
 	}
 }
 
-export default {
-	config,
-	deepClone,
-	deepMerge,
-	showModal,
-	navBack,
-	toast,
-	navTo,
-	checkNewVersion,
-	saveImage,
-};
+// export default {
+// 	config,
+// 	deepClone,
+// 	deepMerge,
+// 	showModal,
+// 	navBack,
+// 	toast,
+// 	navTo,
+// 	checkNewVersion,
+// 	saveImage,
+// };

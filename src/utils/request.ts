@@ -1,7 +1,7 @@
 import { useUserStore } from '@/stores/user';
 
 // import cache from './cache';
-import common from './common';
+import * as common from './common';
 type Method =
 	| 'OPTIONS'
 	| 'GET'
@@ -49,6 +49,7 @@ interface CustomConfig {
 
 // // 避免多个请求时，多次进行跳转
 // export const enableToLogin = true;
+let requestTime = 0;
 export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 	let config: CustomConfig = {
 		method: 'GET',
@@ -62,8 +63,13 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 	config = common.deepMerge(config, customConfig);
 	config.method = config.method!.toUpperCase() as Method;
 	if (config.loading) {
-		uni.showLoading();
+		requestTime++;
+		uni.showLoading({ title: '加载中' });
 	}
+	// const start = new Date().getTime();
+	// while (true) {
+	// 	if (new Date().getTime() - start > 3 * 1000) break;
+	// }
 	return new Promise((resolve, reject) => {
 		// const is_put_post = config.method === 'PUT' || config.method === 'POST';
 		// const openId: string = cache.get('openId');
@@ -74,10 +80,17 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 		}
 		// 是否携带token
 		// const token: string = cache.get('token');
-		const token = userInfo.token;
-		if (token && config.needToken) {
-			const Auth = { UserAuthorization: 'Bearer' + ' ' + token };
-			config.headers = common.deepMerge(config.headers, Auth);
+		if (config.needToken) {
+			const token = userInfo.token;
+			if (token) {
+				// const Auth = { UserAuthorization: 'Bearer' + ' ' + token };
+				const Auth = { Authorization: token };
+				config.headers = common.deepMerge(config.headers, Auth);
+			} else {
+				unLogin('请先登录');
+				reject(new Error('未登录'));
+				return;
+			}
 		}
 		if ((config.isJson === undefined && config.method?.toUpperCase() === 'POST') || config.method?.toUpperCase() === 'PUT') {
 			config.isJson = true;
@@ -104,21 +117,22 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 				}
 				let code = res.data.code;
 				code = code === 0 ? 0 : code || 200;
-				const message = res.data.msg;
+				const message = res.data.message;
 				if (code === 200) {
 					resolve(res.data);
 				} else if (code === 401) {
 					// 如果登录权限异常，就移除登录状态，并且跳转到登录页面
-					const pages = getCurrentPages();
-					const path = pages[pages.length - 1]['route'];
+					unLogin(message);
 					userInfo.removeUserInfo();
-					setTimeout(() => {
-						uni.navigateTo({
-							url: `/pages/login/login?forward=/${path || ''}}`,
-						});
-					}, 1000);
-					errorToast('请先登录');
-					reject(new Error('未登录'));
+					// const pages = getCurrentPages();
+					// const path = pages[pages.length - 1]['route'];
+					// setTimeout(() => {
+					// 	uni.navigateTo({
+					// 		url: `/pages/login/login?forward=/${path || ''}}`,
+					// 	});
+					// }, 1000);
+					// errorToast('请先登录');
+					reject(new Error(message));
 				} else if (code === 500) {
 					uni.showToast({
 						title: message || 'unknow error',
@@ -131,16 +145,40 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 				}
 			},
 			fail: (error) => {
+				errorToast();
 				reject(new Error(error.errMsg));
+			},
+			complete: () => {
+				if (config.loading) {
+					requestTime--;
+					if (requestTime === 0) {
+						uni.hideLoading();
+					}
+				}
 			},
 		});
 	});
 }
+
+function unLogin(errMsg?: string) {
+	// 需要token但是没有实际登录的情况
+	// 如果登录权限异常，就移除登录状态，并且跳转到登录页面
+	const pages = getCurrentPages();
+	const path = pages[pages.length - 1]['route'];
+	setTimeout(() => {
+		uni.navigateTo({
+			url: `/pages/login/login?forward=/${path || ''}}`,
+		});
+	}, 1000);
+	console.log('errMsg', errMsg);
+	errorToast(errMsg);
+}
+
 /**
  * 错误提示
  * @param errMsg
  */
-function errorToast(errMsg: string) {
+function errorToast(errMsg?: string) {
 	// console.error('net errorToast', errMsg);
 	uni.showToast({
 		title: errMsg || '-: net error',
