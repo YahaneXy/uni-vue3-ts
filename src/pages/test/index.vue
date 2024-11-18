@@ -1,6 +1,6 @@
 <template>
 	<view>测试页面 </view>
-	<xy-Tabbar :current-index="1" :height="tabbarHiehgt" />
+	<xy-tabbar :current-index="1" :height="tabbarHiehgt" />
 </template>
 
 <script lang="ts" setup>

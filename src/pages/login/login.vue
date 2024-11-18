@@ -8,7 +8,7 @@
 				</view>
 			</view>
 		</view>
-		<uni-popup ref="popup" type="center" is-mask-click>
+		<!-- <uni-popup ref="popup" type="center" is-mask-click>
 			<view class="pop-area flex flex-dr flex-a">
 				<view class="title">新用户登录</view>
 				<button
@@ -21,7 +21,7 @@
 					手机号一键登录
 				</button></view
 			>
-		</uni-popup>
+		</uni-popup> -->
 		<view class="copyright flex flex-jc flex-a">@copyright - 测试用登录页</view>
 	</view>
 </template>
@@ -72,30 +72,30 @@ function getUserOpenId(): Promise<LoginInfo> {
 		});
 	});
 }
-function getPhoneNumber(e: WechatMiniprogram.ButtonGetPhoneNumber) {
-	if (!e.detail.encryptedData) {
-		return;
-	}
-	getUserOpenId().then((res) => {
-		const data = res;
-		const openId = data.openId;
-		const unionId = data.unionId;
-		const params: LoginParams = {
-			openId,
-			unionId,
-			code: e.detail.code,
-			tenantId: '000000',
-		};
-		user.login(params).then((res) => {
-			const loginInfo: LoginInfo = {
-				openId,
-				unionId,
-				token: res,
-			};
-			afterLogin(loginInfo);
-		});
-	});
-}
+// function getPhoneNumber(e: WechatMiniprogram.ButtonGetPhoneNumber) {
+// 	if (!e.detail.encryptedData) {
+// 		return;
+// 	}
+// 	getUserOpenId().then((res) => {
+// 		const data = res;
+// 		const openId = data.openId;
+// 		const unionId = data.unionId;
+// 		const params: LoginParams = {
+// 			openId,
+// 			unionId,
+// 			code: e.detail.code,
+// 			tenantId: '000000',
+// 		};
+// 		user.login(params).then((res) => {
+// 			const loginInfo: LoginInfo = {
+// 				openId,
+// 				unionId,
+// 				token: res,
+// 			};
+// 			afterLogin(loginInfo);
+// 		});
+// 	});
+// }
 
 // 后端已经缓存了token的操作
 async function loginNew() {

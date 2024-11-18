@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'vue';
+
 import { cssConfig } from '@/config/global';
 
 import { isEmpty, isNumber } from './test';
@@ -39,7 +41,7 @@ export function addUnit(value: string | number = 'auto', unit = '') {
  * @param {String} target 转换的目的，object-转为对象，string-转为字符串
  * @returns {object|string}
  */
-export function addStyle(customStyle: object | string, target = 'object') {
+export function addStyle(customStyle: object | string | CSSProperties, target = 'object') {
 	interface Style {
 		[key: string]: string;
 	}
@@ -82,7 +84,7 @@ export function addStyle(customStyle: object | string, target = 'object') {
  * @param {String} fmt 格式化规则 yyyy:mm:dd|yyyy:mm|yyyy年mm月dd日|yyyy年mm月dd日 hh时MM分等,可自定义组合 默认yyyy-mm-dd
  * @returns {string} 返回格式化后的字符串
  */
-export function timeFormat(dateTime: Date | null | string, formatStr = 'yyyy-mm-dd') {
+export function timeFormat(dateTime: Date | null | string, formatStr = 'yyyy-mm-dd'): string {
 	let date;
 	// 若传入时间为假值，则取当前时间
 	if (!dateTime) {
@@ -127,13 +129,13 @@ export function timeFormat(dateTime: Date | null | string, formatStr = 'yyyy-mm-
 
 	return formatStr;
 }
-
+type RectResultType<T extends boolean> = T extends true ? UniNamespace.NodeInfo[] : UniNamespace.NodeInfo;
 /**
  * 简化获取元素信息的方法
  * @param el 元素的样式
  * @param all 获取全部或单个
  */
-export function queryRect(el: string, all?: boolean, instance?: any): Promise<WechatMiniprogram.BoundingClientRectCallbackResult> {
+export function queryRect<T extends boolean>(el: string, all?: boolean, instance?: any): Promise<RectResultType<T>> {
 	return new Promise((resolve) => {
 		let query: UniNamespace.SelectorQuery | null = null;
 		if (instance) {
@@ -144,7 +146,7 @@ export function queryRect(el: string, all?: boolean, instance?: any): Promise<We
 		query[all ? 'selectAll' : 'select'](el)
 			// .select(el)
 			.boundingClientRect((rect) => {
-				resolve(rect as WechatMiniprogram.BoundingClientRectCallbackResult);
+				resolve(rect as RectResultType<T>);
 			})
 			.exec();
 	});

@@ -3,6 +3,8 @@ import uni from '@dcloudio/vite-plugin-uni';
 import path from 'path';
 import AutoImport from 'unplugin-auto-import/vite';
 import { defineConfig } from 'vite';
+import Components from '@uni-helper/vite-plugin-uni-components';
+import { WotResolver } from '@uni-helper/vite-plugin-uni-components/resolvers';
 export default defineConfig({
 	plugins: [
 		AutoImport({
@@ -13,6 +15,10 @@ export default defineConfig({
 				enabled: true,
 				globalsPropValue: true,
 			},
+		}),
+		Components({
+			dts: 'src/components.d.ts',
+			resolvers: [WotResolver()],
 		}),
 		uni(),
 	],

@@ -88,27 +88,31 @@ export function showModal(title: string, content: string, type: 'default' | 'dan
 /**
  * 返回上一页
  */
-export function navBack(delayTime: number) {
+export function navBack(delayTime = 0) {
 	const pages = getCurrentPages();
 	const prevPage = pages[pages.length - 2]; // 上一个页面
 	// 判断上一页是否为首页，如果是就直接返回首页
-	if (prevPage?.route) {
-		setTimeout(() => {
-			uni.navigateBack({
-				delta: 1,
-				// 失败回调直接返回首页
-				fail: () => {
-					uni.reLaunch({
-						url: '/pages/index/index',
-					});
-				},
+	return new Promise<void>((resolve) => {
+		if (prevPage?.route) {
+			setTimeout(() => {
+				uni.navigateBack({
+					delta: 1,
+					// 失败回调直接返回首页
+					fail: () => {
+						uni.reLaunch({
+							url: '/pages/index/index',
+						});
+					},
+				});
+				resolve();
+			}, delayTime);
+		} else {
+			uni.reLaunch({
+				url: '/pages/index/index',
 			});
-		}, delayTime);
-	} else {
-		uni.reLaunch({
-			url: '/pages/home/home',
-		});
-	}
+			resolve();
+		}
+	});
 }
 /**
  * 跳转

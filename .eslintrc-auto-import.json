@@ -98,6 +98,17 @@
 		"watch": true,
 		"watchEffect": true,
 		"watchPostEffect": true,
-		"watchSyncEffect": true
+		"watchSyncEffect": true,
+		"getUserStore": true,
+		"store": true,
+		"stores": true,
+		"useUserStore": true,
+		"DirectiveBinding": true,
+		"MaybeRef": true,
+		"MaybeRefOrGetter": true,
+		"onWatcherCleanup": true,
+		"useId": true,
+		"useModel": true,
+		"useTemplateRef": true
 	}
 }

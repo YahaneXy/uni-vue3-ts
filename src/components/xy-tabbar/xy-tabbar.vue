@@ -177,6 +177,7 @@ export default {
 		position: relative;
 		.tab-item {
 			position: relative;
+			z-index: 4;
 			height: 100%;
 			.icon {
 				top: 14rpx;
