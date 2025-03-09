@@ -1,7 +1,13 @@
-import manifest from '../manifest.json';
+// import manifest from '../manifest.json';
+import defaultAvatarImg from '@/static/images/avatar_null.png';
+import errorImg from '@/static/images/image_error.png';
 export const config = {
-	appid: manifest['mp-weixin'].appid,
+	// appid: manifest['mp-weixin'].appid,
+	appid: '',
 	url: 'http://192.168.0.79:8080',
+	errorImg,
+	defaultAvatarImg,
+	loadingImg: errorImg,
 };
 if (process.env.NODE_ENV === 'development') {
 	// 开发环境

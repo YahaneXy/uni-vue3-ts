@@ -5,7 +5,6 @@
 </template>
 
 <script lang="ts" setup>
-import XyTabbar from '@/components/xy-tabbar/xy-tabbar.vue';
 import { tabbarHiehgt } from '@/config/global';
 </script>
 <style scoped lang="scss">

@@ -2,3 +2,4 @@
 node_modules/*
 src/uni_modules/*
 src/components/external/*
+.eslintrc-auto-import.json

@@ -1,78 +1,66 @@
 <template>
-	<view class="flex flex-a">
+	<view class="flex flex-a flex1">
 		<view
-			class="search"
+			class="xy-search"
 			:style="{ borderRadius: isShape, height: addUnit(height), backgroundColor: bcgColor, border: isBorder ? `solid 1rpx ${borderColor}` : '0rpx' }"
 		>
 			<template v-if="showLeft">
 				<image v-if="isImg(iconType)" style="width: 14px; height: 14px" :src="iconType"></image>
-				<icon v-else class="icon" :type="iconType" :size="addUnit(iconSize)" :color="iconColor"></icon>
+				<icon v-else class="xy-search-icon" :type="iconType" :size="addUnit(iconSize)" :color="iconColor"></icon>
 			</template>
 			<input
 				v-model="inputer"
-				class="input"
+				class="xy-input"
 				type="text"
 				:placeholder="placeholder ? placeholder : '请输入内容'"
 				:placeholder-style="placeholderStyle"
 				:style="{
 					color,
 				}"
+				:disabled="disabled"
 				@input="valueChange"
 				@confirm="onConfirm"
-				@focus="isFocus = true"
-				@blur="isFocus = false"
+				@focus="handleFocus"
+				@blur="handleBlur"
 			/>
-			<!-- <xy-input
-				v-model="inputer"
-				:style="['flex: 1', 'height: 80%', !isFocus && 'padding-right:20rpx !important']"
-				:placeholder="placeholder"
-				:placeholder-style="placeholderStyle"
-				:bcg-color="bcgColor"
-				:is-border="false"
-				:clearable="false"
-				height="100%"
-				@on-confirm="onConfirm"
-				@on-change="valueChange"
-				@focus="inputFocus"
-			></xy-input> -->
-			<view v-show="showClearIcon && inputer && keepClearShow ? true : isFocus" class="icon-clear flex flex-a" @click="clearInput">
+			<view
+				v-show="showClearIcon && inputer && (keepClearShow ? true : clearIconInnerShow)"
+				class="xy-search-icon-clear flex flex-a"
+				@click="clearInput"
+			>
 				<icon type="clear" :size="addUnit(clearIconSize)" :color="clearIconColor" />
 			</view>
 			<!-- 分割线 -->
-			<view v-if="showDivider" class="divider" :style="dividerStyle"></view>
+			<view v-if="showDivider" class="xy-search-divider" :style="dividerStyle"></view>
 			<!-- 内部的搜索按钮 -->
 			<view
 				v-if="actionShow && !actionOutLayer"
-				class="search-action"
+				class="xy-search-action"
 				:style="actionStyle"
-				hover-class="search-action-hover"
+				hover-class="xy-search-action-hover"
 				hover-stay-time="100"
 				@click="onSearch"
-				>搜索</view
+				>{{ actionText }}</view
 			>
 		</view>
 		<!-- 外部的搜索按钮 -->
 		<view
 			v-if="actionShow && actionOutLayer"
-			class="search-action"
+			class="xy-search-action"
 			:style="actionStyle"
-			hover-class="search-action-hover"
+			hover-class="xy-search-action-hover"
 			hover-stay-time="100"
 			@click="onSearch"
-			>搜索</view
+			>{{ actionText }}</view
 		>
 	</view>
 </template>
 <script lang="ts" setup>
-// import type common from '@/utils/common';
+import type { CSSProperties } from 'vue';
+
 import { addStyle, addUnit } from '@/utils/function';
 import { isObject } from '@/utils/function/test';
 
-// const key = Symbol() as InjectionKey<typeof common>;
-
-// import xyInput from '../xy-input/xy-input.vue';
-// const $common = inject(key)!;
-// const $common = inject('$common') as CustomInterface.Common;
 const $common = inject<CustomInterface.Common>('$common')!;
 
 /**
@@ -96,6 +84,7 @@ const $common = inject<CustomInterface.Common>('$common')!;
  * @property {Boolean}				actionColor				右侧搜索控件颜色
  * @property {Boolean}				actionOutLayer			右侧搜索控件是否显示在外侧
  * @property {String|Object}		actionCustomStyle		右侧搜索控件的自定义样式
+ * @property {String}				actionText				右侧搜索控件文字
  * @property {Boolean}				shape					search框的形状，square方形，round圆形
  * @property {Boolean}				showClearIcon			是否显示清除按钮
  * @property {Boolean}				clearIconColor			清除按钮的颜色
@@ -110,7 +99,7 @@ const $common = inject<CustomInterface.Common>('$common')!;
 
 const props = withDefaults(
 	defineProps<{
-		modelValue: string;
+		modelValue?: string;
 		bcgColor?: string;
 		color?: string;
 		placeholder?: string;
@@ -142,6 +131,8 @@ const props = withDefaults(
 		clearIconSize?: string | number;
 		keepClearShow?: boolean;
 		height?: string | number;
+		actionText?: string;
+		disabled?: boolean;
 	}>(),
 	{
 		modelValue: '',
@@ -167,10 +158,13 @@ const props = withDefaults(
 		clearIconColor: '#ccc',
 		clearIconSize: 30,
 		height: '64rpx',
+		actionText: '搜索',
+		disabled: false,
 	}
 );
 const inputer = ref('');
 const isFocus = ref(false);
+const clearIconInnerShow = ref(false);
 const actionStyle = computed(() => {
 	const radius = props.shape === 'square' ? '10rpx' : '40rpx';
 	let style = {
@@ -217,37 +211,60 @@ const emit = defineEmits<{
 	(e: 'clear'): void;
 	(e: 'focus', value: boolean): void;
 }>();
+
+function handleBlur() {
+	isFocus.value = false;
+}
+function handleFocus() {
+	isFocus.value = true;
+}
+
 // 旧方法
 function valueChange(e: any) {
-	const value = (e as unknown as WechatMiniprogram.CustomEvent).detail.value;
+	const value = e.detail.value;
 	emit('update:modelValue', value);
 }
-// function valueChange(value: string) {
-// 	emit('update:modelValue', value);
-// }
 // 旧方法
-function onConfirm(e: WechatMiniprogram.CustomEvent) {
+function onConfirm(e: any) {
 	emit('search', e.detail.value);
 }
-// function onConfirm(value: string) {
-// 	emit('search', value);
-// }
 
 function onSearch() {
+	if (props.disabled) return;
 	emit('search', props.modelValue);
 }
 
 function clearInput() {
+	if (props.disabled) return;
 	inputer.value = '';
 	emit('clear');
 	emit('update:modelValue', '');
 }
-
-// function inputFocus(focus: boolean) {
-// 	emit('focus', focus);
-// 	isFocus.value = focus;
-// }
-
+watch(
+	() => props.modelValue,
+	(value) => {
+		if (value !== inputer.value) {
+			inputer.value = value;
+		}
+	}
+);
+let timer: ReturnType<typeof setTimeout> | null = null;
+watch(
+	() => isFocus.value,
+	(value) => {
+		if (!value) {
+			if (timer) {
+				clearTimeout(timer);
+				timer = null;
+			}
+			timer = setTimeout(() => {
+				clearIconInnerShow.value = false;
+			}, 50);
+		} else {
+			clearIconInnerShow.value = true;
+		}
+	}
+);
 // 方法
 // 判断传入的name属性，是否图片路径，只要带有"/"均认为是图片形式
 function isImg(value: string) {
@@ -263,7 +280,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.search {
+.xy-search {
 	display: flex;
 	align-items: center;
 	// height: 64rpx;
@@ -286,34 +303,34 @@ export default {
 	// .pr20 {
 	// 	padding-right: 20rpx;
 	// }
-	.icon {
+	.xy-search-icon {
 		margin-right: 10rpx;
 	}
-	.input {
+	.xy-input {
 		// height: 2rem;
 		height: 100%;
 		font-size: 28rpx;
 		flex: 1;
 	}
-	.icon-clear {
+	.xy-search-icon-clear {
 		// padding: 0 0 0 rpx;
 		// padding-left: 20rpx;
 		padding: 10rpx;
 		height: 100%;
 	}
 }
-.search-action {
+.xy-search-action {
 	width: 90rpx;
 	// height: 2rem;
 	// line-height: 2rem;
 	text-align: center;
 	transition: all 50ms;
 }
-.search-action-hover {
+.xy-search-action-hover {
 	background: #cccccc;
 	opacity: 0.75;
 }
-.divider {
+.xy-search-divider {
 	margin-right: -0.5px;
 	height: 80%;
 	// border-color: #004997 !important;

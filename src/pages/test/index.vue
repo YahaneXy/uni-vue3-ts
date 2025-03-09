@@ -5,7 +5,6 @@
 
 <script lang="ts" setup>
 // import { } from '@dcloudio/uni-app';
-import XyTabbar from '@/components/xy-tabbar/xy-tabbar.vue';
 import { tabbarHiehgt } from '@/config/global';
 </script>
 
