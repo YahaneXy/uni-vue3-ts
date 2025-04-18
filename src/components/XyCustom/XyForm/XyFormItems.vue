@@ -1,6 +1,6 @@
 <template>
-	<view ref="formItemRef" class="form-item" :class="[required && label && 'required']">
-		<view v-if="showLabel && label" class="form-label" :style="{ width: addUnit(innerLabelWidth) }">{{ label }}</view>
+	<view ref="formItemRef" class="form-item" :class="[required && label && 'required']" :style="getItemStyle">
+		<view v-if="showLabel && label" class="form-label" :style="getLabelStyle">{{ label }}</view>
 		<view class="form-item-slot w100">
 			<slot></slot>
 			<view class="form-item-error" :style="getStyle()">{{ validateErrorMsg }}</view>
@@ -9,6 +9,8 @@
 </template>
 
 <script setup lang="ts">
+import type { CSSProperties } from 'vue';
+
 import { addUnit } from '@/utils/function';
 
 import { xyFormContextKey, xyFormItemsContextKey } from './constants';
@@ -34,6 +36,22 @@ const innerLabelWidth = computed(() => {
 		width = props.labelWidth;
 	}
 	return width;
+});
+const getItemStyle = computed(() => {
+	const style: CSSProperties = {};
+	if (props.labelPosition === 'left') {
+		style.alignItems = 'center';
+	}
+	if (props.labelPosition === 'top') {
+		style.flexDirection = 'column';
+		style.rowGap = addUnit(props.labelGap);
+	}
+	return style;
+});
+const getLabelStyle = computed(() => {
+	const style: CSSProperties = {};
+	style.width = addUnit(innerLabelWidth.value);
+	return style;
 });
 function validate(status?: validateParams): Promise<boolean> {
 	return new Promise((resolve, reject) => {
@@ -111,7 +129,6 @@ export default {
 .form-item {
 	position: relative;
 	display: flex;
-	align-items: center;
 	padding: 16rpx 0;
 	.form-label {
 		flex-shrink: 0;

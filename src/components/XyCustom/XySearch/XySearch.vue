@@ -1,9 +1,6 @@
 <template>
 	<view class="flex flex-a flex1">
-		<view
-			class="xy-search"
-			:style="{ borderRadius: isShape, height: addUnit(height), backgroundColor: bcgColor, border: isBorder ? `solid 1rpx ${borderColor}` : '0rpx' }"
-		>
+		<view class="xy-search" :style="searchStyle">
 			<template v-if="showLeft">
 				<image v-if="isImg(iconType)" style="width: 14px; height: 14px" :src="iconType"></image>
 				<icon v-else class="xy-search-icon" :type="iconType" :size="addUnit(iconSize)" :color="iconColor"></icon>
@@ -14,9 +11,7 @@
 				type="text"
 				:placeholder="placeholder ? placeholder : '请输入内容'"
 				:placeholder-style="placeholderStyle"
-				:style="{
-					color,
-				}"
+				:style="`color:${color};pointer-events:${disabled ? 'none' : 'inital'}`"
 				:disabled="disabled"
 				@input="valueChange"
 				@confirm="onConfirm"
@@ -33,6 +28,7 @@
 			<!-- 分割线 -->
 			<view v-if="showDivider" class="xy-search-divider" :style="dividerStyle"></view>
 			<!-- 内部的搜索按钮 -->
+			<!-- :class="[innerActionGap && 'xy-search-action-gap']" -->
 			<view
 				v-if="actionShow && !actionOutLayer"
 				class="xy-search-action"
@@ -58,6 +54,7 @@
 <script lang="ts" setup>
 import type { CSSProperties } from 'vue';
 
+import { deepMerge } from '@/utils/common';
 import { addStyle, addUnit } from '@/utils/function';
 import { isObject } from '@/utils/function/test';
 
@@ -75,17 +72,18 @@ const $common = inject<CustomInterface.Common>('$common')!;
  * @property {String}				iconColor				左侧图标颜色
  * @property {String}				iconSize				左侧图标大小
  * @property {String}				iconType				左侧图标，参照https://uniapp.dcloud.net.cn/component/icon.html#，可以是图片
- * @property {String}				isBorder				是否显示border
- * @property {String}				borderColor				border颜色
  * @property {Boolean}				actionShow				是否显示右侧的“搜索”控件
  * @property {Boolean}				showDivider				是否显示右侧控件的分割线
  * @property {Boolean}				dividerColor			右侧分割线颜色
  * @property {Boolean}				dividerCustomStyle		右侧分割线自定义样式
  * @property {Boolean}				actionColor				右侧搜索控件颜色
  * @property {Boolean}				actionOutLayer			右侧搜索控件是否显示在外侧
+ * @property {Boolean}				actionBgColor			右侧搜索控件背景色
+ * @property {Boolean}				innerActionGap			右侧内部搜索控件是否为有距离
  * @property {String|Object}		actionCustomStyle		右侧搜索控件的自定义样式
  * @property {String}				actionText				右侧搜索控件文字
- * @property {Boolean}				shape					search框的形状，square方形，round圆形
+ * @property {String}				borderStyle				border样式
+ * @property {Boolean}				borderRadius			borderRadius的值
  * @property {Boolean}				showClearIcon			是否显示清除按钮
  * @property {Boolean}				clearIconColor			清除按钮的颜色
  * @property {Boolean}				clearIconSize			清除按钮的大小
@@ -100,6 +98,7 @@ const $common = inject<CustomInterface.Common>('$common')!;
 const props = withDefaults(
 	defineProps<{
 		modelValue?: string;
+		customStyle?: CSSProperties;
 		bcgColor?: string;
 		color?: string;
 		placeholder?: string;
@@ -109,22 +108,21 @@ const props = withDefaults(
 		iconSize?: string | number;
 		/** 图标类型，支持类型https://uniapp.dcloud.net.cn/component/icon.html */
 		iconType?: string;
-		/** 显示边框 */
-		isBorder?: boolean;
-		/** 边框颜色 */
-		borderColor?: string;
+		borderStyle?: CSSProperties['border'];
 		/** 显示搜索 */
 		actionShow?: boolean;
 		/** 搜索按钮字体颜色 */
 		actionColor?: string;
+		actionBgColor?: string;
 		actionOutLayer?: boolean;
+		innerActionGap?: boolean;
 		actionCustomStyle?: string | object;
 		// 右侧分割线
 		showDivider?: boolean;
 		dividerColor?: string;
 		dividerCustomStyle?: CSSProperties;
 		// 形状
-		shape?: 'square' | 'round';
+		borderRadius?: number | string;
 		// 是否显示清除
 		showClearIcon?: boolean;
 		clearIconColor?: string;
@@ -136,22 +134,23 @@ const props = withDefaults(
 	}>(),
 	{
 		modelValue: '',
+		customStyle: () => ({}),
 		bcgColor: '#ffffff',
 		color: '#000',
 		showLeft: true,
-		isBorder: true,
-		borderColor: '#cccccc',
+		borderStyle: 'solid 1rpx #ccc',
 		// 右侧搜索
 		actionShow: true,
-		actionColor: '#000',
+		actionBgColor: 'var(--color-main)',
 		actionBorderColor: '#ccc',
 		actionOutLayer: false,
+		innerActionGap: false,
 		actionCustomStyle: '',
 		// 右侧分割线
 		dividerColor: '#000',
 		iconType: 'search',
 		iconColor: '#999',
-		shape: 'round',
+		borderRadius: '10rpx',
 		placeholderStyle: 'color: #999999',
 		iconSize: 30,
 		showClearIcon: true,
@@ -165,13 +164,25 @@ const props = withDefaults(
 const inputer = ref('');
 const isFocus = ref(false);
 const clearIconInnerShow = ref(false);
+const searchStyle = computed(() => {
+	const style: CSSProperties = {
+		borderRadius: addUnit(props.borderRadius),
+		height: addUnit(props.height),
+		backgroundColor: props.bcgColor,
+		border: props.borderStyle,
+	};
+	const cusStyle: CSSProperties = deepMerge(style, props.customStyle);
+	return cusStyle;
+});
 const actionStyle = computed(() => {
-	const radius = props.shape === 'square' ? '10rpx' : '40rpx';
-	let style = {
+	// const radius = props.shape === 'square' ? '10rpx' : '40rpx';
+	const radius = props.borderRadius;
+	let style: CSSProperties = {
+		// borderRadius: `0 ${radius} ${radius} 0`,
 		borderRadius: `0 ${radius} ${radius} 0`,
 		height: props.height || '1.8rem',
 		lineHeight: props.height || '1.8rem',
-		color: props.actionColor,
+		color: props.actionColor || '#000',
 	};
 	if (props.actionOutLayer) {
 		const defaultActionStyle = {
@@ -184,14 +195,29 @@ const actionStyle = computed(() => {
 		style.borderRadius = '10rpx';
 		style = Object.assign(style, defaultActionStyle);
 	}
+	if (props.actionBgColor) {
+		style.background = props.actionBgColor;
+		style.color = props.actionColor || 'white';
+	}
+	if (props.innerActionGap) {
+		const innerStyle: CSSProperties = {
+			display: 'flex',
+			alignItems: 'center',
+			marginRight: '4rpx',
+			padding: '0 42rpx',
+			width: 'initial !important',
+			height: '90% !important',
+			fontSize: '28rpx',
+			lineHeight: 'initial !imoprtant',
+			borderRadius: radius,
+		};
+		style = Object.assign(style, innerStyle);
+	}
 	if (isObject(props.actionCustomStyle)) {
 		return addStyle($common.deepMerge(style, props.actionCustomStyle as object)) as string;
 	}
 	const custom = addStyle(props.actionCustomStyle as object) || {};
 	return $common.deepMerge(style, custom as object);
-});
-const isShape = computed(() => {
-	return props.shape === 'square' ? '10rpx' : '40rpx';
 });
 
 const dividerStyle = computed(() => {
@@ -326,6 +352,17 @@ export default {
 	text-align: center;
 	transition: all 50ms;
 }
+// .xy-search-action-gap {
+// 	display: flex;
+// 	align-items: center;
+// 	margin-right: 4rpx;
+// 	padding: 0 42rpx !important;
+// 	width: initial !important;
+// 	height: 90% !important;
+// 	font-size: 28rpx;
+// 	border-radius: 999rpx !important;
+// 	line-height: initial !important;
+// }
 .xy-search-action-hover {
 	background: #cccccc;
 	opacity: 0.75;
