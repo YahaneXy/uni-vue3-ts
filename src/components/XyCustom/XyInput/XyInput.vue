@@ -27,9 +27,11 @@
  * @property {String}				bcgColor				背景色
  * @property {String}				placeholder				占位文字内容（默认为“请输入内容”）
  * @property {String}				placeholderStyle		占位文字样式，只支持字符串
+ * @property {String|CSSProperties}	customStyle				自定义style
  * @property {String}				isBorder				是否显示border
  * @property {String}				borderColor				border颜色
  * @property {Boolean}				shape					input框的形状，square方形，round圆形
+ * @property {Number}				round					border-radius的值，如果有该值，则shape无效
  * @property {Boolean}				clearable				是否显示清除按钮
  * @property {Boolean}				clearIconColor			清除按钮的颜色
  * @property {Boolean}				clearIconSize			清除按钮的大小
@@ -100,7 +102,6 @@ const isRound = computed(() => {
 });
 
 const getStyle = () => {
-	// borderRadius: isRound, height: addUnit(height), backgroundColor: bcgColor, padding: isBorder ? '0 20rpx' : '0'
 	const style: CSSProperties = {};
 	style.borderRadius = isRound.value;
 	style.height = addUnit(props.height);

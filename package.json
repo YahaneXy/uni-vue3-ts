@@ -11,6 +11,7 @@
 		"dev:app-android": "uni -p app-android",
 		"dev:app-ios": "uni -p app-ios",
 		"dev:custom": "uni -p",
+		"dev": "uni",
 		"dev:h5": "uni",
 		"dev:h5:ssr": "uni --ssr",
 		"dev:mp-alipay": "uni -p mp-alipay",
@@ -20,6 +21,7 @@
 		"dev:mp-lark": "uni -p mp-lark",
 		"dev:mp-qq": "uni -p mp-qq",
 		"dev:mp-toutiao": "uni -p mp-toutiao",
+		"dev:mp-weixin": "uni -p mp-weixin",
 		"dev-wx": "uni -p mp-weixin",
 		"dev:quickapp-webview": "uni -p quickapp-webview",
 		"dev:quickapp-webview-huawei": "uni -p quickapp-webview-huawei",
@@ -64,7 +66,7 @@
 		"vue": "^3.4.21",
 		"vue-demi": "^0.14.5",
 		"vue-i18n": "^9.1.9",
-		"wot-design-uni": "^1.3.8"
+		"wot-design-uni": "^1.8.0"
 	},
 	"devDependencies": {
 		"@dcloudio/types": "^3.4.8",

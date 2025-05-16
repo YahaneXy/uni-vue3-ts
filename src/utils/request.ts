@@ -1,6 +1,5 @@
 import { useUserStore } from '@/stores/user';
 
-// import cache from './cache';
 import * as common from './common';
 type Method =
 	| 'OPTIONS'
@@ -28,24 +27,6 @@ interface CustomConfig {
 	isJson?: boolean;
 	[index: string]: any;
 }
-// interface ResponseData {
-// 	code: number;
-// 	msg?: string;
-// 	data?: any;
-// 	rows?: any;
-// 	total?: number;
-// 	pageNum?: number;
-// 	pageSize?: number;
-// }
-// interface ResponseData {
-// 	code: number;
-// 	msg?: string;
-// 	data?: any;
-// 	rows?: any;
-// 	total?: number;
-// 	pageNum?: number;
-// 	pageSize?: number;
-// }
 
 // // 避免多个请求时，多次进行跳转
 // export const enableToLogin = true;
@@ -62,28 +43,20 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 	const userInfo = useUserStore();
 	config = common.deepMerge(config, customConfig);
 	config.method = config.method!.toUpperCase() as Method;
+	requestTime++;
 	if (config.loading) {
-		requestTime++;
 		uni.showLoading({ title: '加载中' });
 	}
-	// const start = new Date().getTime();
-	// while (true) {
-	// 	if (new Date().getTime() - start > 3 * 1000) break;
-	// }
 	return new Promise((resolve, reject) => {
-		// const is_put_post = config.method === 'PUT' || config.method === 'POST';
-		// const openId: string = cache.get('openId');
 		const openId = userInfo.openId;
 		if (openId && config.needToken) {
 			const idObj = { openId };
 			config.headers = common.deepMerge(config.headers, idObj);
 		}
 		// 是否携带token
-		// const token: string = cache.get('token');
 		if (config.needToken) {
 			const token = userInfo.token;
 			if (token) {
-				// const Auth = { UserAuthorization: 'Bearer' + ' ' + token };
 				const Auth = { Authorization: token };
 				config.headers = common.deepMerge(config.headers, Auth);
 			} else {
@@ -124,14 +97,6 @@ export function request<T = any>(customConfig: CustomConfig = {}): Promise<T> {
 					// 如果登录权限异常，就移除登录状态，并且跳转到登录页面
 					unLogin(message);
 					userInfo.removeUserInfo();
-					// const pages = getCurrentPages();
-					// const path = pages[pages.length - 1]['route'];
-					// setTimeout(() => {
-					// 	uni.navigateTo({
-					// 		url: `/pages/login/login?forward=/${path || ''}}`,
-					// 	});
-					// }, 1000);
-					// errorToast('请先登录');
 					reject(new Error(message));
 				} else if (code === 500) {
 					uni.showToast({
